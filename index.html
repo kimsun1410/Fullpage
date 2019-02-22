@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <meta name="format-detection" content="telephone=no">
+    <title></title>
+    <meta name="title" content="">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <meta property="og:title" content="">
+    <meta property="og:type " content="website">
+    <meta property="og:url " content="">
+    <meta property="og:image " content="">
+    <meta property="og:description " content="">
+    <title>풀페이지 스크롤</title>
+    <style type="text/css">
+        @charset "utf-8";
+        body, div, p, h1, h2, h3, h4, h5, h6, ul, ol, li, dl, dt, dd, table, tr, th, td, caption, form, fieldset, input, select, textarea, blockquote, address, button {margin:0;padding:0}
+        h1, h2, h3, h4, h5, h6 {font-size:100%}
+        ul, ol, li {list-style:none}s
+        img, fieldset, button {padding:0;margin:0;border:0 none}
+        button {background:none}
+        address, em {font-style:normal}
+        table {border-collapse:collapse;border-spacing:0}
+        q:before, q:after {content:''}
+
+        /* html5 tag */
+        article, aside, details, figure, figcaption, footer, header, hgroup, menu, nav, section {display:block;margin:0;padding:0}
+        body {width:100%;height:100%;overflow-y:hidden}
+        body, input, select {background:#fff;color:#000;font:62.5%/1 "돋음", Dotum, Arial, sans-serif;-webkit-user-select:none;-webkit-text-size-adjust:none} /* 아이폰 가로보기시 자동확대 방지 */
+        input, select {font-size:1em}
+        a {color:#fff;text-decoration:none}
+        /*a:hover, a:focus {color:#fff}*/
+        .blind {position:absolute;top:-9999px;visibility:hidden;width:0;height:0;font-size:1%;line-height:0}
+        hr {display:none}
+        strong {font-weight:normal}
+        caption {display:none}
+        button {cursor:pointer;/*outline:none*/}
+        label {cursor:pointer}
+         #loading {
+            position: fixed;
+            bottom: 0;
+            background: url(http://www.wonderpeople.co.kr/img/logo-wonder-people.svg) 50% 50% no-repeat #000;
+            background-size: 100px auto;
+            z-index: 999999;
+            transition: all 1s ease-out;
+            transition-delay: .1s;
+            -webkit-transition-timing-function: cubic-bezier(.86, 0, .070, 1);
+            -moz-transition-timing-function: cubic-bezier(.86, 0, .070, 1);
+            -o-transition-timing-function: cubic-bezier(.86, 0, .070, 1);
+            transition-timing-function: cubic-bezier(.86, 0, .070, 1);
+        }
+        .loaded #loading {top:0;bottom:100%;left:0;right:0;}
+        #fullpage {position:fixed;top:0;left:0;right:0;bottom:0;}
+        .page {position:relative;
+            width:100%;height:100;text-align:center;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            -webkit-transition: all 1s ease-out;
+            -o-transition: all 1s ease-out;
+            -moz-transition: all 1s ease-out;
+            transition: all 1s ease-out;
+            -webkit-transition-timing-function: cubic-bezier(.86, 0, .070, 1);
+            -moz-transition-timing-function: cubic-bezier(.86, 0, .070, 1);
+            -o-transition-timing-function: cubic-bezier(.86, 0, .070, 1);
+            transition-timing-function: cubic-bezier(.86, 0, .070, 1);
+        }
+        .page.active{opacity:1;background-position:50% 50%;}
+        .page#home {background:url('') green;}
+        .page#about {background:url('') blue;}
+        .page#work {background:url('') navy;}
+        .page#contact {background:url('') red;}
+        .slide {text-align:center;}
+        .side li {margin-bottom:10px;width:10px;height:10px;border-radius:15px;text-align:center;border:2px solid #fff;cursor:pointer;}
+        .side li span {display:inline-block;width:6px;height:6px;margin-top:2px;border-radius:15px;text-indent:-9999em;}
+        .side li.on {background:#fff;}
+        .side[data-page=home] .pos {right:-100px;opacity:0;}
+        .side[data-page=home] .scroll{bottom:50px;opacity:1;}
+        .side, .side .scroll {-webkit-transition:all .5s ease-out;-o-transition:all .5s ease-out;}
+        .side.inactive {opacity:0;visibility:hidden;}
+        .side .scroll {
+            display: block;
+            position: fixed;
+            z-index: 99;
+            width: 1px;
+            height: 1px;
+            height: 100px;
+            cursor: pointer;
+            right: 60px;
+            bottom: -200px;
+            -moz-transition: all .5s ease-out;
+            transition: all .5s ease-out;
+            opacity: 0;
+        }
+        .side .scroll .label {
+            display: block;
+            font-size: 13px;
+            letter-spacing: .2em;
+            color: #fff;
+            position: absolute;
+            top: -80px;
+            font-weight: 700;
+            left: 0;
+            -webkit-transform-origin: 0 50%;
+            -moz-transform-origin: 0 50%;
+            -ms-transform-origin: 0 50%;
+            -o-transform-origin: 0 50%;
+            transform-origin: 0 50%;
+            -webkit-transform: rotate(90deg);
+            -ms-transform: rotate(90deg);
+            -o-transform: rotate(90deg);
+            -moz-transform: rotate(90deg);
+            transform: rotate(90deg);
+        }
+        .side .scroll .line {width:1px;background:#fff;height:100px;position:absolute;left:50%;display:block;}
+        .side .scroll .line:after, .side .scroll .line:before {width:20px;position:absolute;top:100%;left:50%;      display: block;}
+        .side .pos:after, .side .scroll .line:after, .side .scroll .line:before {height:1px;background:#fff;        content: ''}
+        .side .scroll .line:before {
+            margin-left: .5px;
+            -webkit-transform-origin: 100% 50%;
+            -moz-transform-origin: 100% 50%;
+            -ms-transform-origin: 100% 50%;
+            -o-transform-origin: 100% 50%;
+            transform-origin: 100% 50%;
+            -webkit-transform: translateX(-100%) rotate(45deg);
+            -moz-transform: translateX(-100%) rotate(45deg);
+            -ms-transform: translateX(-100%) rotate(45deg);
+            -o-transform: translateX(-100%) rotate(45deg);
+            transform: translateX(-100%) rotate(45deg);
+        }
+        .side .scroll .line:after {
+            -webkit-transform-origin: 0 50%;
+            -moz-transform-origin: 0 50%;
+            -ms-transform-origin: 0 50%;
+            -o-transform-origin: 0 50%;
+            transform-origin: 0 50%;
+            -webkit-transform: translateX(0) rotate(-45deg);
+            -moz-transform: translateX(0) rotate(-45deg);
+            -ms-transform: translateX(0) rotate(-45deg);
+            -o-transform: translateX(0) rotate(-45deg);
+            transform: translateX(0) rotate(-45deg);
+        }
+
+        .side .pos {
+            position: fixed;
+            margin-top:-10px;
+            padding-right:50px;
+            font-size:16px;
+            letter-spacing:.1em;
+            line-height:20px;
+            right:0;
+            top:50%;
+            -webkit-transition: all .5s ease-out;
+            -o-transition: all .5s ease-out;
+            -moz-transition: all .5s ease-out;
+            transition: all .5s ease-out;
+            opacity:1;
+            z-index:99;
+        }
+        .side .pos:after {width:40px;position:absolute;top:50%;right:0;}
+        .side .pos span {display: inline-block;vertical-align: middle;font-size:16px;}
+        .side .pos span.current, .side .pos span.total {margin:0 6px;}
+        .side .pos span.current {font-weight: 700;}
+        .page .square-bottom {
+            width: 1px;
+            height: 1px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translateY(-300px) rotate(45deg);
+            -moz-transform: translateY(-300px) rotate(45deg);
+            -ms-transform: translateY(-300px) rotate(45deg);
+            -o-transform: translateY(-300px) rotate(45deg);
+            transform: translateY(-300px) rotate(45deg);
+        }
+        .page .square-bottom:after, .page .square-top:after {
+            width:100vmax;
+            position:absolute;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            border:1px solid #fff;
+            opacity:.2;
+            border-right:0;
+            border-bottom:0;
+        }
+        .page .square-top {
+            width:1px;
+            height:1px;
+            position:absolute;
+            top:50%;
+            left:50%;
+            -webkit-transform: translateY(300px) rotate(-135deg);
+            -moz-transform: translateY(300px) rotate(-135deg);
+            -ms-transform: translateY(300px) rotate(-135deg);
+            -o-transform: translateY(300px) rotate(-135deg);
+            transform: translateY(300px) rotate(-135deg);
+        }
+        .page .square-bottom:after, .page .square-top:after{content:'';padding:50vmax 0;}
+        .page .line-top{width:1px;bottom:50%;margin-bottom:300px;}
+        .page .line-bottom{width:1px;top:50%;margin-top:300px;}
+        .page .line-bottom, .page .line-top {height:100vh;opacity:.2;position:absolute;left:50%;background:#fff;}
+    </style>
+    <script type="text/javascript" src="js/jquery.min.js"></script> 
+    <script type="text/javascript" src="js/jquery.easings.min.js"></script> 
+    <script type="text/javascript">
+        window.isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
+        window.MOBILE_WIDTH = 740;
+        $(document).ready(function(){
+            pagefull();
+            nav_li();
+            $(window).on('resize', function(){
+                    $('.process li').css({'height':'auto'});
+                    var maxHeight = 0;
+                    $('.process li').each(function(){
+                        maxHeight = Math.max(maxHeight, $(this).innerHeight());
+                    });
+                    $('.process li').css({'height':maxHeight});
+                }).trigger('resize');
+
+            $(window).on('load', function(){
+                start();
+            });
+            setTimeout(function(){
+                start();
+            }, 2000);
+        });
+
+        function start() {
+            if ($('body').hasClass('loaded') ) return;
+                $('body').addClass('loaded');
+            if ( window.location && window.location.hash && window.location.hash != '') {
+                checkHash();
+            } else {
+               showPage('home');
+            }
+        }
+        window.onhashchange = function(e){
+            if ( window.location && window.location.hash && window.location.hash != '') {
+                checkHash();
+            }
+        };
+
+        function checkHash() {
+            var hash = window.location.hash;
+            var target = hash.replace('#/', '');
+            var target = $('.page[id="' + target.replace('#', '') + '"]');
+            if ( target.size() > 0 ) {
+                showPage(target.attr('id'));
+            } else {
+                showPage('home');
+            }
+        }
+
+        function showPage(id) {
+            var target = $('.page#' + id).removeClass('prev next').addClass('active');
+            target.prevAll().removeClass('active prev next').addClass('prev');
+            target.nextAll().removeClass('active prev next').addClass('next');
+
+            var pageId = target.data('page-id')
+            $('#nav li').removeClass('active');
+            $('#nav a[href="#' + pageId + '"]').closest('li').addClass('active');
+
+
+            $('#side').attr('data-page', id);
+            var totalPage = $('.page').length;
+            var currentPageIndex = $('.page.active').index();
+            $('#side .current').html(String('0' + Math.max(currentPageIndex, 1)).substring(-1,2) );
+            $('#side .total').html( String('0' + (totalPage-1)).substring(-1,2) );
+        }
+
+        function pagefull(){
+            var winheight = $(window).height();
+            $(".page").height(winheight);
+            
+            // 페이지에 따른 side 생성
+            var pageindex = $("#fullpage > div").size();
+            $("#fullpage").prepend(
+                "<div id='side' class='side' data-page='home'>" +
+                "<a class='scroll'>" +
+                "<span class='label'>SCROLL</span>" +
+                "<span class='line'>" +
+                "</span>" +
+                "</a>" +
+                "<ul class='pos'>"
+            );
+            for(var i=1;i<=pageindex;i++){
+                $("#fullpage > .side > ul").append("<li><span>"+i+"</span></li>");
+            }
+            $("#fullpage .side li:first-child").addClass("on");
+           
+            // 마우스 휠 이벤트
+            var isAutoScrolling = false;
+            $(window).bind("mousewheel", function(event){
+                // var vvv= event.originalEvent.wheelDelta; // wheelDelta 값은 늘 업과 다운에 따라서 120 or -120을 가진다.   
+                var side = $(".side ul li.on");
+                if($("body").find("#fullpage:animated").length >= 1) return false;
+                if(event.originalEvent.wheelDelta >= 0) { // up
+                    if(side.index() >= 0) side.prev().addClass("on").siblings(".on").removeClass("on");
+                    if(side.index() > 0){
+                        side = side.index()-1;
+                        $("#fullpage").animate({"top": -winheight*side + "px"},800, "easeOutExpo");
+                        movePrevPage(); 
+                    };
+                             
+                }else{ // down
+                    if(side.index() <= $(".side ul li").size()-1) side.next().addClass("on").siblings(".on").removeClass("on");
+                    if(side.index() < 3){
+                        side = side.index() + 1;
+                        $("#fullpage").animate({"top": -winheight*side + "px"},800, "easeOutExpo");
+                    };
+                    moveNextPage();             
+                }
+                isAutoScrolling = true;
+                setTimeout(function(){
+                    isAutoScrolling = false;
+                }, 1000);
+            });
+        }
+        function moveNextPage() {
+            if ( $('.page.active').next().length == 0 )  return;
+            var target = $('.page.active').next().attr('id');
+            showPage(target);
+        }
+        function movePrevPage() {
+            if ( $('.page.active').prev().length == 0 )  return;
+            var target = $('.page.active').prev().attr('id');
+            console.log(target);
+            showPage(target);
+        }
+        // side 클릭시 페이지 이동
+        function nav_li(){
+            var winheight = $(window).height();
+            var target_next = $('.page.active').next().attr('id');
+            var target_prev = $('.page.active').prev().attr('id');
+    
+            $(".side li").click(function(){
+                var sideindex = $(this).index();
+                var target = $('.page.active').next().attr('id');
+                if($("body").find("#fullpage:animated").length >= 1) return false;
+                $(this).addClass("on").siblings("li").removeClass("on");
+                $("#fullpage").animate({"top": -winheight*sideindex + "px"},800, "easeInOutQuint");
+                showPage(target);
+                return false;
+            });
+        }
+    </script>
+    <!--[if lt IE 9]>
+    <script src="assets/js/vendor/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div id="loading"></div>
+    <div id="fullpage">
+        <div id="home" class="page" data-page-id="home">
+            <div class="square-top"></div>
+            <div class="square-bottom"></div>
+        </div>
+        <div id="about" class="page" data-page-id="about" >
+            <div class="square-top"></div>
+            <div class="line-bottom"></div>
+            
+        </div>
+        <div id="work" class="page" data-page-id="work" >
+            <div class="line-top"></div>
+            <div class="square-bottom"></div>
+        </div>
+        <div id="contact" class="page" data-page-id="contact" >4</div>
+    </div>
+</body>
+</html>
